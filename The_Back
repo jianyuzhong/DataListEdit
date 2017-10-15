@@ -1,0 +1,198 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
+
+public partial class linkmansystem : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            DataList1.DataSource = Selectstu();
+            DataList1.DataBind();
+            DropDownList2.DataSource = dpDataSet(); //下拉列表要显示的值
+            DropDownList2.DataTextField = "GroupName";
+            DropDownList2.DataValueField = "GroupId";
+            DropDownList2.DataBind();
+        }
+
+    }
+
+    protected void DataList1_ItemDataBound(object sender, DataListItemEventArgs e)
+    {
+        if(e.Item.ItemType==ListItemType.EditItem)
+        {
+            if(e.Item.ItemIndex>-1)
+            {
+                HtmlInputHidden lt = (HtmlInputHidden)e.Item.FindControl("Hidden1");
+                DropDownList dp = (DropDownList)e.Item.FindControl("DropDownList1");
+                dp.DataSource = dpDataSet();
+                dp.DataTextField = "GroupName";
+                dp.DataValueField = "GroupId";
+                dp.SelectedValue = lt.Value;
+                dp.DataBind();
+               
+            }
+        }
+        else
+        {
+            if (e.Item.ItemIndex > -1)
+            {
+                Literal lt = (Literal)e.Item.FindControl("Literal1");
+                string GroupName = ToName((Convert.ToInt32(lt.Text)));
+                lt.Text = GroupName;
+                LinkButton a = (LinkButton)e.Item.FindControl("LinkButton2");
+                a.Attributes.Add("onclick", "return confirm(\"是否确认删除？\")");
+            }
+        }
+    }
+
+    protected void DataList1_EditCommand(object source, DataListCommandEventArgs e)
+    {
+        DataList1.EditItemIndex = e.Item.ItemIndex;
+        DataList1.DataSource = Selectstu();
+        DataList1.DataBind();
+       
+
+    }
+
+    protected void DataList1_UpdateCommand(object source, DataListCommandEventArgs e)
+    {
+        
+        if (e.Item.ItemIndex>-1)
+        {
+            HtmlInputHidden lt= (HtmlInputHidden)e.Item.FindControl("Hidden2");
+            TextBox txt1 = (TextBox)e.Item.FindControl("TextBox1");
+            TextBox txt2 = (TextBox)e.Item.FindControl("TextBox2");
+            DropDownList dp = (DropDownList)e.Item.FindControl("DropDownList1");
+            updates(Convert.ToInt32(lt.Value), txt1.Text,Convert.ToInt64(txt2.Text), (dp.SelectedIndex + 1));
+            Response.Redirect("linkmansystem.aspx");
+
+        }
+    }
+
+    protected void DataList1_CancelCommand(object source, DataListCommandEventArgs e)
+    {
+        Response.Redirect("linkmansystem.aspx");
+    }
+
+    protected void DataList1_DeleteCommand(object source, DataListCommandEventArgs e)
+    {
+        if(e.Item.ItemIndex>-1)
+        {
+            HtmlInputHidden lt = (HtmlInputHidden)e.Item.FindControl("Hidden3");
+            deleteStu(Convert.ToInt32(lt.Value));
+            Response.Redirect("linkmansystem.aspx");
+        }
+    }
+
+    protected void Button2_Click(object sender, EventArgs e)
+    {
+        string name = TextBox3.Text;
+        string tel = TextBox4.Text;
+        int groupid = DropDownList2.SelectedIndex;
+        insert(name, tel, groupid);
+        Response.Redirect("linkmansystem.aspx");
+
+    }
+    public DataSet dpDataSet()
+    {
+        string strcon = "Data Source=DESKTOP-BRRT43V;Initial Catalog=LinkMan;Persist Security Info=True;User ID=sa;Password=123456";
+        SqlConnection conn = new SqlConnection(strcon);
+        conn.Open();
+        SqlDataAdapter da = new SqlDataAdapter("select  *from mGroup ", conn);
+        DataSet ds = new DataSet();
+        da.Fill(ds, "mGroup");
+        conn.Close();
+        return ds;
+        
+    }
+    public string ToName(int index)
+    {
+       
+        string strcon = "Data Source=DESKTOP-BRRT43V;Initial Catalog=LinkMan;Persist Security Info=True;User ID=sa;Password=123456";
+        SqlConnection conn = new SqlConnection(strcon);
+        conn.Open();
+        SqlCommand com = new SqlCommand("select GroupName from mGroup where GroupId=1",conn);
+        SqlDataReader reader = com.ExecuteReader();
+        
+        while (reader.Read())
+        {
+            string name = reader["GroupName"].ToString();
+            return name;
+
+        }
+        return null;
+  
+    }
+    public DataSet Selectstu()
+    {
+        string strcon = "Data Source=DESKTOP-BRRT43V;Initial Catalog=LinkMan;Persist Security Info=True;User ID=sa;Password=123456";
+        SqlConnection conn = new SqlConnection(strcon);
+        conn.Open();
+        SqlCommand cmd = new SqlCommand("select * from myLinkMan",conn);
+        SqlDataAdapter da = new SqlDataAdapter(cmd);
+        DataSet ds = new DataSet();
+        da.Fill(ds, "myLinkMan");
+        return ds;
+
+
+
+    }
+    public void updates(int id,string name,long tel,int groupid)
+    {
+        string strcon = "Data Source=DESKTOP-BRRT43V;Initial Catalog=LinkMan;Persist Security Info=True;User ID=sa;Password=123456";
+        SqlConnection conn = new SqlConnection(strcon);
+        conn.Open();
+        SqlCommand cmd = new SqlCommand("update myLinkMan set Name='" + name + "',Tel='" + tel + "',GroupId='" + groupid + "' where id='" + id + "'",conn);
+        try
+        {
+            cmd.ExecuteNonQuery();
+        }
+        catch(Exception e)
+        {
+            throw (e);
+        }
+        conn.Close();
+
+    }
+    public void deleteStu(int id)
+    {
+        string strcon = "Data Source=DESKTOP-BRRT43V;Initial Catalog=LinkMan;Persist Security Info=True;User ID=sa;Password=123456";
+        SqlConnection conn = new SqlConnection(strcon);
+        conn.Open();
+        SqlCommand cmd = new SqlCommand("delete myLinkMan where id='"+id+"' ", conn);
+        try
+        {
+            cmd.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            throw (e);
+        }
+        conn.Close();
+    }
+    public void insert(string name,string tel,int GroupId)
+    {
+        string strcon = "Data Source=DESKTOP-BRRT43V;Initial Catalog=LinkMan;Persist Security Info=True;User ID=sa;Password=123456";
+        SqlConnection conn = new SqlConnection(strcon);
+        conn.Open();
+        SqlCommand cmd = new SqlCommand("insert into myLinkMan  values('"+name+"','"+tel+"','"+GroupId+"') ", conn);
+        try
+        {
+            cmd.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            throw (e);
+        }
+        conn.Close();
+
+    }
+}
