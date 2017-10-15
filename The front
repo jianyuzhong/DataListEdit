@@ -1,0 +1,109 @@
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="linkmansystem.aspx.cs" Inherits="linkmansystem" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <style>
+        .aa
+        {
+            position:relative;
+            top:10px;
+            left:245px;
+            width:420px;
+            height:100px
+        }
+        .bb{
+            position:relative;
+            left:245px;
+            width:420px;
+            height:0px
+        }
+    </style>
+</head>
+    
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <center>
+            <h1 style="text-align:center">联系人管理</h1>
+
+            <asp:DataList ID="DataList1" runat="server" OnItemDataBound="DataList1_ItemDataBound" OnEditCommand="DataList1_EditCommand" OnUpdateCommand="DataList1_UpdateCommand" OnCancelCommand="DataList1_CancelCommand" OnDeleteCommand="DataList1_DeleteCommand">
+                <HeaderTemplate>
+                    <table width="860px" border="0" cellpadding="1" cellspecing="2" >
+                        <tr>
+                            <td width="200px">姓名</td>
+                            <td width="200px">电话</td>
+                            <td width="300px">分组</td>
+                            <td>操作</td>
+                        </tr>
+                    </table>
+                </HeaderTemplate>
+                <ItemTemplate>
+                    <table width="860px">
+                        <tr>
+                             <td width="200px"><input id="Hidden3" type="hidden" runat="server" value='<%#Eval("id") %>'/><%#Eval("Name") %></td>
+                            <td width="200px">
+                              <%#Eval("Tel") %>
+                                </td>
+                            <td width="300px">
+                                <asp:Literal ID="Literal1" runat="server"  Text=' <%#Eval("GroupId") %>' ></asp:Literal>
+                                </td>
+                            <td>
+                                <asp:LinkButton ID="LinkButton1" runat="server" CommandName="Edit">编辑</asp:LinkButton>
+                                <asp:LinkButton ID="LinkButton2" runat="server" CommandName="Delete">删除</asp:LinkButton>
+                            </td>
+                        </tr>
+                    </table>
+                </ItemTemplate>
+                <FooterTemplate></FooterTemplate>
+
+                <EditItemTemplate>
+                    <table width="860px">
+                        <tr>
+                            <td width="200px">
+                                <br />
+                                <input id="Hidden2" type="hidden" runat="server" value='<%#Eval("id") %>' />
+                                <asp:TextBox ID="TextBox1" Text='<%#Eval("Name") %>' runat="server"></asp:TextBox>
+                                <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ErrorMessage="姓名不能为空" ControlToValidate="TextBox1"></asp:RequiredFieldValidator>
+                            </td>
+                            <td width="200px">
+                                <asp:TextBox ID="TextBox2" runat="server" Text='<%#Eval("Tel") %>'></asp:TextBox>
+                            </td>
+                            <td width="300px"><input id="Hidden1" type="hidden" runat="server" value='<%#Eval("GroupId") %>'/><asp:DropDownList ID="DropDownList1" runat="server"  ></asp:DropDownList></td>
+                             <td><asp:LinkButton ID="LinkButton1" runat="server" CommandName="Update">更新</asp:LinkButton>&nbsp;&nbsp;<asp:LinkButton ID="LinkButton2" runat="server" CommandName="Cancel">取消</asp:LinkButton></td>
+                        </tr>
+                    </table>
+                </EditItemTemplate>
+                
+
+
+            </asp:DataList>
+                </center>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <div class="bb" id="div2">
+               <input id="Button1" type="button" value="添加新人员"  onclick="xianshi()"  /> 
+            </div>
+             <div class="aa" id="div1" style="visibility:hidden" >
+            姓名：<asp:TextBox ID="TextBox3" runat="server" ValidationGroup="aa"></asp:TextBox><asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ErrorMessage="姓名不能为空" ControlToValidate="TextBox3" ValidationGroup="aa"></asp:RequiredFieldValidator><br/>
+            电话：<asp:TextBox ID="TextBox4" runat="server"></asp:TextBox><br />
+            分组：<asp:DropDownList ID="DropDownList2" runat="server" ></asp:DropDownList><br/>
+            <asp:Button ID="Button2" runat="server" Text="添加" OnClick="Button2_Click" ValidationGroup="aa"   />
+        </div>
+        </div>
+    </form>
+</body>
+</html>
+<script src="Scripts/jquery-3.1.1.min.js"></script>
+
+<script>
+    function xianshi()
+    {
+        var a = document.getElementById("div1");
+        a.removeAttribute("style");
+        var b = document.getElementById("div2");
+        b.setAttribute("style", "visibility:hidden");
+    }
+</script>
